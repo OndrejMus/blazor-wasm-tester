@@ -1,0 +1,61 @@
+﻿@page "/japaneseName"
+
+<h3>JapaneseName</h3>
+
+<MudTextField DebounceInterval="500"
+              OnDebounceIntervalElapsed="Translate"
+              @bind-Value="@name"
+              HelperText=""
+              Label="Name" Variant="Variant.Outlined"
+              Adornment="Adornment.End"
+              AdornmentIcon="@Icons.Material.Filled.Search" />
+
+<MudTextField @bind-Value="@translatedName"
+              Label="Japanese name" Variant="Variant.Outlined"
+              Adornment="Adornment.End"
+              AdornmentIcon="@Icons.Material.Filled.Search" />
+@code {
+    string name;
+    string translatedName;
+
+    Dictionary<char, string> dict = new Dictionary<char, string>() 
+    {
+        {'a',"ka" },
+        {'b',"zu" },
+        {'c',"mi" },
+        {'d',"te" },
+        {'e',"ku" },
+        {'f',"lu" },
+        {'g',"ji" },
+        {'h',"ri" },
+        {'i',"ki" },
+        {'j',"zu" },
+        {'k',"me" },
+        {'l',"ta" },
+        {'m',"rin" },
+        {'n',"to" },
+        {'o',"mo" },
+        {'p',"no" },
+        {'q',"ke" },
+        {'r',"shi" },
+        {'s',"ari" },
+        {'t',"chi" },
+        {'u',"do" },
+        {'v',"ru" },
+        {'w',"me" },
+        {'x',"na" },
+        {'y',"fu" },
+        {'z',"zi" },
+    };
+
+
+    private void Translate()
+    {
+        translatedName = string.Empty;
+        foreach (char currentchar in name)
+        {
+
+            translatedName += dict[Char.ToLower(currentchar)];
+        }
+    }
+}

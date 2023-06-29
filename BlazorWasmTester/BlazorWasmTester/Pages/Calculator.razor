@@ -1,0 +1,103 @@
+﻿@page "/calculator"
+<h3>Calculator</h3>
+
+
+<MudNumericField @bind-Value="doubleValue" Label="Enter a double" Format="F1" Variant="Variant.Outlined" />
+
+<MudNumericField @bind-Value="result" Label="Result" Format="F1" Variant="Variant.Outlined" ReadOnly />
+
+<MudPaper Class="pa-8 ma-2" Elevation="3">
+    <p>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="Add" Title="Plus" />
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Remove" OnClick="Minus" Title="Minus" />
+    </p>
+    <p>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Close" OnClick="Times" Title="Times" />
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Create" OnClick="Devide" Title="Devide" />
+    </p>
+    <p>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Superscript" OnClick="Power" Title="Power" />
+    </p>
+    <p>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Clear">Clear</MudButton>
+    </p>
+</MudPaper>
+
+<MudDataGrid Items="@operations">
+    <Columns>
+        <PropertyColumn Property="x => x.previousResult" Title="Previous result" />
+        <PropertyColumn Property="x => x.operation" Title="Operation" />
+        <PropertyColumn Property="x => x.operand" Title="Operand" />        
+        <PropertyColumn Property="x => x.result" Title="Result" />
+    </Columns>
+</MudDataGrid>
+
+
+@code {
+
+    double doubleValue;
+    double result;
+    List<Operation> operations = new List<Operation>();
+
+    private class Operation
+    {
+        public double previousResult;
+        public double operand;
+        public double result;
+        public string operation;
+
+        public Operation(double previousResult, double operand, double result, string operation)
+        {
+            this.previousResult = previousResult;
+            this.operand = operand;
+            this.result = result;
+            this.operation = operation;
+
+        }
+    }
+
+    private void Clear()
+    {
+        double previousResult = result;
+        result = 0;
+        doubleValue = 0;
+        operations.Insert(0, new Operation(previousResult, doubleValue, result, "Clear"));
+    }
+
+    private void Add()
+    {
+        double previousResult = result;
+        result = result + doubleValue;
+        operations.Insert(0, new Operation(previousResult, doubleValue, result, "+"));
+    }
+    private void Minus()
+    {
+        double previousResult = result;
+        result = result - doubleValue;
+        operations.Insert(0, new Operation(previousResult, doubleValue, result, "-"));
+    }
+
+    private void Times()
+    {
+        double previousResult = result;
+        result = result * doubleValue;
+        operations.Insert(0, new Operation(previousResult, doubleValue, result, "*"));
+    }
+
+    private void Devide()
+    {
+        double previousResult = result;
+        result = result / doubleValue;
+        operations.Insert(0, new Operation(previousResult, doubleValue, result, "/"));
+    }
+    
+    private void Power()
+    {
+        double previousResult = result;   
+        result = Math.Pow(result, doubleValue);
+        operations.Insert(0,new Operation(previousResult,doubleValue, result, "Pow"));
+    }
+
+
+}
+
