@@ -7,3 +7,4 @@
   - In Workflow permissions, select Read and write permissions
   - Re run failed jobs it should work
 - Follow guide https://swimburger.net/blog/dotnet/how-to-deploy-aspnet-blazor-webassembly-to-github-pages
+  - Publish command will create release folder in repo root
