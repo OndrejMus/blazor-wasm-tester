@@ -30,4 +30,4 @@ jobs:
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages
-        FOLDER: blazor-wasm-tester/BlazorWasmTester/BlazorWasmTester/bin/Release/net6.0/wwwroot
+        FOLDER: BlazorWasmTester/BlazorWasmTester/bin/Release/net6.0/wwwroot
