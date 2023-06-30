@@ -1,1 +1,3 @@
 # blazor-wasm-tester
+
+test
