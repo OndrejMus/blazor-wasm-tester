@@ -1,6 +1,9 @@
 ﻿
 
-<MudButton @bind-Value="@Selected" Variant="@(Selected ? Variant.Outlined : Variant.Text)" OnClick="Switch">@Race.Name</MudButton>
+<MudButton @bind-Value="@Selected"
+           Color="Color.Primary" 
+           Variant="@(Selected ? Variant.Filled : Variant.Text)" 
+           @onclick="@(() => { Switch(); OnClickCallback.InvokeAsync(); })">@Race.Name</MudButton>
 
 @code {
 
@@ -18,5 +21,8 @@
 
     [Parameter]
     public EventCallback<bool> SelectedChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnClickCallback { get; set; }
 
 }
