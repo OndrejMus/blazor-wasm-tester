@@ -1,0 +1,22 @@
+﻿
+
+<MudButton @bind-Value="@Selected" Variant="@(Selected ? Variant.Outlined : Variant.Text)" OnClick="Switch">@Class.Name</MudButton>
+
+@code {
+
+    [Parameter]
+    public Model.WowClassPickerModel.Class Class { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; } = false;
+
+    private void Switch()
+    {
+        Selected = !Selected;
+        SelectedChanged.InvokeAsync(Selected);
+    }
+
+    [Parameter]
+    public EventCallback<bool> SelectedChanged { get; set; }
+
+}

@@ -1,0 +1,113 @@
+﻿@page "/classPicker"
+
+
+<MudText Typo="Typo.h4">Classes</MudText>
+<MudPaper Class="d-flex flex-wrap gap-4">
+    @foreach (var item in classSelections)
+    {
+        <BlazorWasmTester.Components.WowClassPicker @bind-Selected="@item.Selected" Class=@item.SelectedClass ></BlazorWasmTester.Components.WowClassPicker>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllClasses">Select all</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllClasses">Deselect all</MudButton>
+</MudPaper>
+
+<MudText Typo="Typo.h4">Races</MudText>
+<MudPaper Class="d-flex flex-wrap gap-4">
+    @foreach (var item in raceSelections)
+    {
+        <BlazorWasmTester.Components.WowRacePicker @bind-Selected="@item.Selected" Race="@item.SelectedRace" ></BlazorWasmTester.Components.WowRacePicker>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllRaces">Select all</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllRaces">Deselect all</MudButton>
+</MudPaper>
+
+
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectCombination">Pick combination</MudButton>
+@* <MudPaper Class="d-flex flex-wrap gap-4"> *@
+    <MudTextField @bind-Value="@selectedClass.Name" Label="Class" ReadOnly="true" Variant="Variant.Outlined" />
+    <MudTextField @bind-Value="@selectedRace.Name" Label="Race" ReadOnly="true" Variant="Variant.Outlined" />
+@* </MudPaper> *@
+
+
+
+@code{
+    Model.WowClassPickerModel.Class war = Model.WowClassPickerModel.Classes[((int)Model.WowClassPickerModel.ClassNames.Warrior)];
+
+    List<ClassSelectionStatus> classSelections = new List<ClassSelectionStatus>();
+    List<RaceSelectionStatus> raceSelections = new List<RaceSelectionStatus>();
+
+    Model.WowClassPickerModel.Class selectedClass = new Model.WowClassPickerModel.Class();
+    Model.WowClassPickerModel.Race selectedRace = new Model.WowClassPickerModel.Race();
+
+    protected override void OnInitialized()
+    {
+        foreach (var item in Model.WowClassPickerModel.Classes)
+        {
+            classSelections.Add(new ClassSelectionStatus() { Selected = false, SelectedClass = item });
+        }
+
+        foreach (var item in Model.WowClassPickerModel.Races)
+        {
+            raceSelections.Add(new RaceSelectionStatus() { Selected = false, SelectedRace = item });
+        }
+
+        base.OnInitialized();
+    }
+
+    public void SelectCombination()
+    {
+        Random random = new Random();
+        List<ClassSelectionStatus> selectedClasses = classSelections.Where(x => x.Selected == true).ToList();
+        selectedClass = selectedClasses[random.Next(0, selectedClasses.Count)].SelectedClass;
+
+        List<RaceSelectionStatus> selectedRaces = raceSelections.Where(x => x.Selected == true).ToList();
+        selectedRace = selectedRaces[random.Next(0, selectedRaces.Count)].SelectedRace;
+    }
+
+    public void SelectAllClasses()
+    {
+        foreach (var item in classSelections)
+        {
+            item.Selected = true;
+        }
+    }
+
+    public void SelectAllRaces()
+    {
+        foreach (var item in raceSelections)
+        {
+            item.Selected = true;
+        }
+    }
+
+    public void DeselectAllClasses()
+    {
+        foreach (var item in classSelections)
+        {
+            item.Selected = false;
+        }
+    }
+
+    public void DeselectAllRaces()
+    {
+        foreach (var item in raceSelections)
+        {
+            item.Selected = false;
+        }
+    }
+
+    public class ClassSelectionStatus
+    {
+        public bool Selected = false;
+        public Model.WowClassPickerModel.Class SelectedClass;
+    }
+
+    public class RaceSelectionStatus
+    {
+        public bool Selected = false;
+        public Model.WowClassPickerModel.Race SelectedRace;
+    }
+
+
+}
