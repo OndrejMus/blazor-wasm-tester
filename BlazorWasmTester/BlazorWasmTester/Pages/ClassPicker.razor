@@ -8,20 +8,19 @@
     {
         <BlazorWasmTester.Components.WowClassPicker @bind-Selected="@item.Selected" Class=@item.SelectedClass ></BlazorWasmTester.Components.WowClassPicker>
     }
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllClasses">Select all</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllClasses">Deselect all</MudButton>
 </MudPaper>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllClasses">Select all</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllClasses">Deselect all</MudButton>
 
 <MudText Typo="Typo.h4">Races</MudText>
 <MudPaper Class="d-flex flex-wrap gap-4" Elevation="3">
     @foreach (var item in raceSelections)
     {
         <BlazorWasmTester.Components.WowRacePicker @bind-Selected="@item.Selected" Race="@item.SelectedRace" ></BlazorWasmTester.Components.WowRacePicker>
-    }
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllRaces">Select all</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllRaces">Deselect all</MudButton>
+    }    
 </MudPaper>
-
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectAllRaces">Select all</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeselectAllRaces">Deselect all</MudButton>
 
 <MudText Typo="Typo.h4">Combination</MudText>
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectCombination">Pick combination</MudButton>
