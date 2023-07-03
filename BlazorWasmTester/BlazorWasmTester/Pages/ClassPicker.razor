@@ -1,8 +1,9 @@
 ﻿@page "/classPicker"
+@inject ISnackbar Snackbar
 
 
 <MudText Typo="Typo.h4">Classes</MudText>
-<MudPaper Class="d-flex flex-wrap gap-4">
+<MudPaper Class="d-flex flex-wrap gap-4" Elevation="3">
     @foreach (var item in classSelections)
     {
         <BlazorWasmTester.Components.WowClassPicker @bind-Selected="@item.Selected" Class=@item.SelectedClass ></BlazorWasmTester.Components.WowClassPicker>
@@ -12,7 +13,7 @@
 </MudPaper>
 
 <MudText Typo="Typo.h4">Races</MudText>
-<MudPaper Class="d-flex flex-wrap gap-4">
+<MudPaper Class="d-flex flex-wrap gap-4" Elevation="3">
     @foreach (var item in raceSelections)
     {
         <BlazorWasmTester.Components.WowRacePicker @bind-Selected="@item.Selected" Race="@item.SelectedRace" ></BlazorWasmTester.Components.WowRacePicker>
@@ -22,11 +23,11 @@
 </MudPaper>
 
 
-
+<MudText Typo="Typo.h4">Combination</MudText>
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SelectCombination">Pick combination</MudButton>
-@* <MudPaper Class="d-flex flex-wrap gap-4"> *@
-    <MudTextField @bind-Value="@selectedClass.Name" Label="Class" ReadOnly="true" Variant="Variant.Outlined" />
+@* <MudPaper Class="d-flex flex-wrap gap-4" Elevation="3"> *@
     <MudTextField @bind-Value="@selectedRace.Name" Label="Race" ReadOnly="true" Variant="Variant.Outlined" />
+    <MudTextField @bind-Value="@selectedClass.Name" Label="Class" ReadOnly="true" Variant="Variant.Outlined" />    
 @* </MudPaper> *@
 
 
@@ -34,11 +35,11 @@
 @code{
     Model.WowClassPickerModel.Class war = Model.WowClassPickerModel.Classes[((int)Model.WowClassPickerModel.ClassNames.Warrior)];
 
-    List<ClassSelectionStatus> classSelections = new List<ClassSelectionStatus>();
-    List<RaceSelectionStatus> raceSelections = new List<RaceSelectionStatus>();
+    public List<ClassSelectionStatus> classSelections = new List<ClassSelectionStatus>();
+    public List<RaceSelectionStatus> raceSelections = new List<RaceSelectionStatus>();
 
-    Model.WowClassPickerModel.Class selectedClass = new Model.WowClassPickerModel.Class();
-    Model.WowClassPickerModel.Race selectedRace = new Model.WowClassPickerModel.Race();
+    public Model.WowClassPickerModel.Class selectedClass = new Model.WowClassPickerModel.Class();
+    public Model.WowClassPickerModel.Race selectedRace = new Model.WowClassPickerModel.Race();
 
     protected override void OnInitialized()
     {
@@ -59,10 +60,31 @@
     {
         Random random = new Random();
         List<ClassSelectionStatus> selectedClasses = classSelections.Where(x => x.Selected == true).ToList();
-        selectedClass = selectedClasses[random.Next(0, selectedClasses.Count)].SelectedClass;
-
         List<RaceSelectionStatus> selectedRaces = raceSelections.Where(x => x.Selected == true).ToList();
-        selectedRace = selectedRaces[random.Next(0, selectedRaces.Count)].SelectedRace;
+        // selectedClass = selectedClasses[random.Next(0, selectedClasses.Count)].SelectedClass;
+
+        var combinationsFilteredByClassxxx = Model.WowClassPickerModel.xx
+        .Where(x => selectedClasses.Any(y => y.SelectedClass.Name == x.Item1)).ToList();
+
+        var combinationsFilteredByRacexxx = combinationsFilteredByClassxxx
+        .Where(x => selectedRaces.Any(y => y.SelectedRace.Name == x.Item2)).ToList();
+
+        if (combinationsFilteredByRacexxx.Count() > 0)
+        {
+            int index = random.Next(0, combinationsFilteredByRacexxx.Count());
+
+            selectedClass = Model.WowClassPickerModel.Classes.Single(x => x.Name == combinationsFilteredByRacexxx[index].Item1);
+            selectedRace = Model.WowClassPickerModel.Races.Single(x => x.Name == combinationsFilteredByRacexxx[index].Item2);
+        }
+        else
+        {
+            Snackbar.Add("No valid combination found.");
+            selectedClass = new Model.WowClassPickerModel.Class();
+            selectedRace = new Model.WowClassPickerModel.Race();
+        }
+        // List<RaceSelectionStatus> selectedRaces = raceSelections.Where(x => x.Selected == true 
+        //     && Model.WowClassPickerModel.ClassRaceCombinations.Where(y => y.Key == selectedClass.Name && y.Value == x.SelectedRace.Name).ToList();
+        // selectedRace = selectedRaces[random.Next(0, selectedRaces.Count)].SelectedRace;
     }
 
     public void SelectAllClasses()
@@ -100,13 +122,13 @@
     public class ClassSelectionStatus
     {
         public bool Selected = false;
-        public Model.WowClassPickerModel.Class SelectedClass;
+        public Model.WowClassPickerModel.Class? SelectedClass;
     }
 
     public class RaceSelectionStatus
     {
         public bool Selected = false;
-        public Model.WowClassPickerModel.Race SelectedRace;
+        public Model.WowClassPickerModel.Race? SelectedRace;
     }
 
 
