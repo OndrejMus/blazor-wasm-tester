@@ -1,0 +1,50 @@
+﻿@inject ISnackbar Snackbar
+
+<MudTextField @bind-Value="@charName" Label="Name" ReadOnly="true" Variant="Variant.Outlined" />
+
+@code {
+    // [Parameter]
+    // public string charRace { get; set;}
+
+    // [Parameter]
+    // public string charClass { get; set;}
+
+    [Parameter]
+    public string charName { get; set; } = string.Empty;
+
+    // [Parameter]
+    // public string apiKey { get; set;}
+
+    private ChatGptIntegration chatGptIntegration = null;
+    public async void CallChatbot(string charRace, string charClass, string apiKey)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            Snackbar.Add("Please provide api key.");
+            return;
+        }
+        if (chatGptIntegration == null)
+        {
+            chatGptIntegration = new ChatGptIntegration(apiKey);
+        }
+
+        string systemMessage = "Generate name fitting for World of Warcraft character with race and class provided. Name should be appropriate for both race and class. Name can be one or two words long. Respond only with generated name. Don't return names of existing characters from Warcraft lore and World of Warcraft.";
+        string question = string.Format("Race: {0}, Class: {0}",charRace,charClass);
+
+        try
+        {
+            Snackbar.Add("Generating name.");
+            charName = await chatGptIntegration.SimpleQueryWithConditioning(question, systemMessage);
+            Snackbar.Add("Name generated: "+charName);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            chatGptIntegration = null;
+            Snackbar.Add("Error happened: "+ex.Message);
+            //throw ex;
+        }
+        
+    }
+
+}

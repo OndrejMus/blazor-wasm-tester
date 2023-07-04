@@ -31,11 +31,19 @@
     <MudTextField @bind-Value="@selectedClass.Name" Label="Class" ReadOnly="true" Variant="Variant.Outlined" />    
 @* </MudPaper> *@
 
+<MudText Typo="Typo.h4">Name generator</MudText>
+<MudTextField @bind-Value="@apiKey" Label="Chat GPT API key" Variant="Variant.Outlined" />
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CallGenerateName">Generate name</MudButton>
+<BlazorWasmTester.Components.WowNameGenerator @ref="nameGenerator"></BlazorWasmTester.Components.WowNameGenerator>
+
 
 
 @code{
     Model.WowClassPickerModel.Class war = Model.WowClassPickerModel.Classes[((int)Model.WowClassPickerModel.ClassNames.Warrior)];
 
+    Components.WowNameGenerator nameGenerator;
+
+    public string apiKey;
     public List<ClassSelectionStatus> classSelections = new List<ClassSelectionStatus>();
     public List<RaceSelectionStatus> raceSelections = new List<RaceSelectionStatus>();
 
@@ -57,6 +65,11 @@
         }
 
         base.OnInitialized();
+    }
+
+    public void CallGenerateName()
+    {
+        nameGenerator.CallChatbot(selectedRace.Name.ToString(), selectedClass.Name.ToString(), apiKey);
     }
 
     public void SelectCombination()
