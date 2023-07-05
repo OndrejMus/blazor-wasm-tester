@@ -1,0 +1,118 @@
+﻿@page "/timer"
+@using System.Diagnostics;
+@* @using System.Media; *@
+@inject IJSRuntime JS
+
+
+<h3>Timer</h3>
+
+<MudTimePicker Label="Length" @bind-Time="@MaxInput" />
+
+<MudTextField Value="@remainingStr" ReadOnly="true"
+              Label="Remaining" Variant="Variant.Outlined"/>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Start">Start</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Stop">Stop</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Reset">Reset</MudButton>
+
+@* <audio autoplay controls><source src="\audio\403014_5121236-lq.mp3" /></audio> *@
+<audio id="sound" src="\audio\403014_5121236-lq.mp3" />
+
+@code {
+
+    public Stopwatch stopwatch = new Stopwatch();
+    public System.Timers.Timer timer = new System.Timers.Timer();
+    public TimeSpan remaining = TimeSpan.FromMilliseconds(0);
+
+    private TimeSpan? _maxInput = TimeSpan.Zero;
+    public TimeSpan? MaxInput
+    {
+        get { return _maxInput; }
+        set
+        {
+            if (_maxInput == value)
+            {
+                return;
+            }
+            _maxInput = value;
+            SetTime();
+        }
+    }
+
+    public TimeSpan max = TimeSpan.FromMinutes(5);
+    public string remainingStr => remaining.ToString(@"hh\:mm\:ss\.fff");
+
+    protected override void OnInitialized()
+    {
+        Init();
+        base.OnInitialized();
+    }
+
+    private void Init()
+    {
+        timer.Interval = 7;
+        timer.Elapsed += Tick;
+        timer.AutoReset = true;
+    }
+
+    private void Start()
+    {
+        timer.Start();
+        stopwatch.Start();
+
+    }
+
+    private void Stop()
+    {
+        timer.Stop();
+        stopwatch.Stop();
+    }
+
+    private void Reset()
+    {
+        Stop();
+        stopwatch.Reset();
+        SetTime();
+    }
+
+    private void SetTime()
+    {
+        Stop();
+        stopwatch.Reset();
+        remaining = (TimeSpan)MaxInput;
+        max = (TimeSpan)MaxInput;
+    }
+
+    private void Tick(object? sender, EventArgs e)
+    {
+
+        double difInMs = max.TotalMilliseconds - stopwatch.ElapsedMilliseconds;
+        if (difInMs <= 0)
+        {
+            Stop();
+            remaining = TimeSpan.FromMilliseconds(0);
+            PlayAlertSound();
+        }
+        else
+        {
+            remaining = TimeSpan.FromMilliseconds(max.TotalMilliseconds - stopwatch.ElapsedMilliseconds);
+        }
+
+        StateHasChanged();
+    }
+
+    private void PlayAlertSound()
+    {
+        // string soundUrl = "https://example.com/soundfile.wav";
+
+        string script = "document.getElementById('sound').play();";
+        JS.InvokeVoidAsync("eval", script);
+
+        // using (var soundPlayer = new SoundPlayer(soundUrl))
+        // {
+        //     soundPlayer.Play();
+        // }
+    }
+
+
+}
