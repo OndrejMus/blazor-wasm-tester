@@ -32,7 +32,10 @@
 @* </MudPaper> *@
 
 <MudText Typo="Typo.h4">Name generator</MudText>
-<MudTextField @bind-Value="@apiKey" Label="Chat GPT API key" Variant="Variant.Outlined" />
+@* <MudTextField @bind-Value="@apiKey" Label="Chat GPT API key" Variant="Variant.Outlined" /> *@
+
+<MudTextField @bind-Value="@apiKey" Label="Chat GPT API key" Variant="Variant.Outlined" InputType="@PasswordInput" />
+
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CallGenerateName">Generate name</MudButton>
 <BlazorWasmTester.Components.WowNameGenerator @ref="nameGenerator"></BlazorWasmTester.Components.WowNameGenerator>
 
@@ -44,6 +47,7 @@
     Components.WowNameGenerator nameGenerator;
 
     public string apiKey;
+    InputType PasswordInput = InputType.Password;
     public List<ClassSelectionStatus> classSelections = new List<ClassSelectionStatus>();
     public List<RaceSelectionStatus> raceSelections = new List<RaceSelectionStatus>();
 
