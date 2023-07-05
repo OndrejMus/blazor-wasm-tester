@@ -1,0 +1,131 @@
+﻿@page "/timer2"
+@using System.Diagnostics;
+@inject IJSRuntime JS
+
+
+<h3>Timer 2</h3>
+
+<MudPaper Class="d-inline-flex flex-wrap gap-4" Elevation="0">
+    <MudNumericField @bind-Value="Hours" Label="Hours" Variant="Variant.Outlined" Min="0" Max="10" />
+    <MudNumericField @bind-Value="Minutes" Label="Minutes" Variant="Variant.Outlined" Min="0" Max="60" />
+    <MudNumericField @bind-Value="Seconds" Label="Seconds" Variant="Variant.Outlined" Min="0" Max="60" />
+</MudPaper>
+
+
+<MudTextField Value="@remainingStr" ReadOnly="true"
+              Label="Remaining" Variant="Variant.Outlined"/>
+
+@if (!started)
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Start">Start</MudButton>
+}
+
+@if (started)
+{
+    @if (enabled)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Pause">Pause</MudButton>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Unpause">Unpause</MudButton>
+    }
+}
+
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Reset">Reset</MudButton>
+
+
+<audio id="sound" src="audio/403014_5121236-lq.mp3" />
+
+@code {
+    public int Hours;
+    public int Minutes;
+    public int Seconds;
+
+    public Stopwatch stopwatch = new Stopwatch();
+    public System.Timers.Timer timer = new System.Timers.Timer();
+    public TimeSpan remaining = TimeSpan.FromMilliseconds(0);
+
+    public TimeSpan max = TimeSpan.FromMinutes(5);
+    public string remainingStr => remaining.ToString(@"hh\:mm\:ss\.fff");
+
+    public bool enabled => timer.Enabled;
+    public bool started = false;
+
+    protected override void OnInitialized()
+    {
+        Init();
+        base.OnInitialized();
+    }
+
+    private void Init()
+    {
+        timer.Interval = 7;
+        timer.Elapsed += Tick;
+        timer.AutoReset = true;
+    }
+
+    private void Unpause()
+    {
+        timer.Start();
+        stopwatch.Start();
+
+    }
+
+    private void Start()
+    {
+        Reset();
+        timer.Start();
+        stopwatch.Start();
+        started = true;
+    }
+
+    private void Pause()
+    {
+        timer.Stop();
+        stopwatch.Stop();
+    }
+
+    private void Reset()
+    {
+        Pause();
+        stopwatch.Reset();
+        SetTime();
+        started = false;
+    }
+
+    private void SetTime()
+    {
+        stopwatch.Reset();
+        TimeSpan ts = TimeSpan.FromHours(Hours).Add(TimeSpan.FromMinutes(Minutes).Add(TimeSpan.FromSeconds(Seconds)));
+
+        remaining = ts; ;
+        max = ts;
+    }
+
+    private void Tick(object? sender, EventArgs e)
+    {
+        double difInMs = max.TotalMilliseconds - stopwatch.ElapsedMilliseconds;
+        if (difInMs <= 0)
+        {
+            Pause();
+            remaining = TimeSpan.FromMilliseconds(0);
+            PlayAlertSound();
+        }
+        else
+        {
+            remaining = TimeSpan.FromMilliseconds(max.TotalMilliseconds - stopwatch.ElapsedMilliseconds);
+        }
+
+        StateHasChanged();
+    }
+
+    private void PlayAlertSound()
+    {
+        string script = "document.getElementById('sound').play();";
+        JS.InvokeVoidAsync("eval", script);
+    }
+
+
+}
