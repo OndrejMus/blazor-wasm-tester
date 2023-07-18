@@ -20,7 +20,12 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.402
+        dotnet-version: 7.0.306
+        
+    - name: Restore NuGet packages
+      env:
+        BUILD_CONFIG: Release
+      run: dotnet workload restore --configuration $BUILD_CONFIG --project BlazorWasmTester/BlazorWasmTester/BlazorWasmTester.csproj
         
     # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
