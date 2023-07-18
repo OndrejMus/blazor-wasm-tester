@@ -25,7 +25,7 @@ jobs:
     - name: Restore NuGet packages
       env:
         BUILD_CONFIG: Release
-      run: dotnet workload restore --configuration $BUILD_CONFIG
+      run: dotnet workload restore --configuration $BUILD_CONFIG --project BlazorWasmTester/BlazorWasmTester/BlazorWasmTester.csproj
         
     # publishes Blazor project to the release-folder
     - name: Publish .NET Core Project
