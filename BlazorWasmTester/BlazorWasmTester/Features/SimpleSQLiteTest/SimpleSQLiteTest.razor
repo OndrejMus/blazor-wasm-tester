@@ -1,0 +1,49 @@
+﻿@page "/notes"
+@using SqliteWasmHelper;
+@* @inject BlazorWasmTester.Features.SimpleSQLiteTest.INotesRepository NotesRepository *@
+@inject ISqliteWasmDbContextFactory<NotesDbContext> Factory
+
+<h1>Notes</h1>
+
+@if (notesRepository != null && notesRepository.GetNotes().Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var note in notesRepository.GetNotes())
+            {
+                <tr>
+                    <td>@note.Title</td>
+                    <td>@note.Content</td>
+                    <td>@note.CreatedAt</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No notes found.</p>
+}
+
+
+<a href="/create-note">Create New Note</a>
+
+
+
+@code{
+    NotesRepository notesRepository;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotesDbContext notesContext = await Factory.CreateDbContextAsync();
+        notesRepository = new NotesRepository(notesContext);
+        // return base.OnInitializedAsync();
+    }
+}

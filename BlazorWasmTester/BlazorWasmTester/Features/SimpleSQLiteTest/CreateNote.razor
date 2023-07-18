@@ -1,0 +1,39 @@
+﻿@page "/create-note"
+@using SqliteWasmHelper;
+@inject ISqliteWasmDbContextFactory<NotesDbContext> Factory
+@inject NavigationManager NavManager
+
+<MudTextField @bind-Value="@title"
+              Label="Title" Variant="Variant.Outlined"  />
+
+<MudTextField @bind-Value="@content"
+              Label="Content" Variant="Variant.Outlined" />
+
+<MudButton Variant="Variant.Outlined" @onclick="AddNote">Add note</MudButton>
+
+
+@code {
+    public string title;
+    public string content;
+
+    NotesRepository notesRepository;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotesDbContext notesContext = await Factory.CreateDbContextAsync();
+        notesRepository = new NotesRepository(notesContext);
+        // return base.OnInitializedAsync();
+    }
+
+    public async void AddNote()
+    {
+        Note note = new Note();
+        note.Title = title;
+        note.Content = content;
+
+        notesRepository.CreateNote(note);
+
+        NavManager.NavigateTo("/notes");
+    }
+
+}

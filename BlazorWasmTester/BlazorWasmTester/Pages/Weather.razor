@@ -1,0 +1,83 @@
+﻿@page "/weather"
+
+@using BrowserInterop
+@using BrowserInterop.Extensions;
+@using BrowserInterop.Geolocation;
+@using System.Globalization;
+
+@inject IJSRuntime jsRuntime;
+
+<h3>Weather</h3>
+
+<button id="navigator-sendBeacon" type="button" @onclick="SendBeacon">SendBeacon</button>
+
+<button id="navigator-geolocation-get" type="button" @onclick="GetGeolocation">Get Geolocation</button>
+@if (geolocationResult != null)
+{
+
+
+    @* <text>
+        GeolocationCoordinates :
+        Geoposition Changed :
+    </text> <span id="navigator-geolocation-changed">@geopositionChanged</span>
+    <button id="navigator-geolocation-event-change-stop" type="button" @onclick="async () => await geopositionWatcher.DisposeAsync()">Dispose geoposition event handler</button>
+ *@
+
+    @if (geolocationResult.Location != null)
+    {
+        <ul>
+            <li>TimestampDateTime: <span id="navigator-geolocation-timestamp">@geolocationResult.Location.TimestampDateTime</span></li>
+            <li>Latitude: <span id="navigator-geolocation-coords-latitude">@geolocationResult.Location.Coords.Latitude.ToString(CultureInfo.InvariantCulture)</span></li>
+            <li>Longitude: <span id="navigator-geolocation-coords-longitude">@geolocationResult.Location.Coords.Longitude.ToString(CultureInfo.InvariantCulture)</span></li>
+            <li>Accuracy: <span id="navigator-geolocation-coords-accuracy">@geolocationResult.Location.Coords.Accuracy.ToString(CultureInfo.InvariantCulture)</span></li>
+            @* <li>Altitude: <span id="navigator-geolocation-coords-altitude">@geolocationResult.Location.Coords.Altitude.Value.ToString(CultureInfo.InvariantCulture)</span></li>
+            <li>AltitudeAccuracy: <span id="navigator-geolocation-coords-altitudeAccuracy">@geolocationResult.Location.Coords.AltitudeAccuracy.Value.ToString(CultureInfo.InvariantCulture)</span></li>
+            <li>Heading: <span id="navigator-geolocation-coords-heading">@geolocationResult.Location.Coords.Heading.Value.ToString(CultureInfo.InvariantCulture)</span></li>
+            <li>Speed: <span id="navigator-geolocation-coords-speed">@geolocationResult.Location.Coords.Speed.Value.ToString(CultureInfo.InvariantCulture)</span></li> *@
+        </ul>
+    }
+    @if (geolocationResult.Error != null)
+    {
+        <text>   ErrorEventArgs :</text>
+        <ul>
+            <li>CodeEnum: @geolocationResult.Error.CodeEnum</li>
+            <li>Message: @geolocationResult.Error.Message</li>
+        </ul>
+    }
+}
+
+@code {
+    // https://developer.yr.no/
+
+    private WindowInterop window;
+    private WindowNavigator navigator;
+    private GeolocationResult geolocationResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        window = await jsRuntime.Window();
+        navigator = await window.Navigator();
+    }
+
+    public async Task SendBeacon()
+    {
+        await navigator.SendBeacon(new Uri("/test"), "BLBLA");
+    }
+
+    public async Task GetGeolocation()
+    {
+        geolocationResult = await navigator.Geolocation.GetCurrentPosition(new PositionOptions()
+            {
+                EnableHighAccuracy = true,
+                MaximumAgeTimeSpan = TimeSpan.FromHours(1),
+                TimeoutTimeSpan = TimeSpan.FromMinutes(1)
+            });
+        // geopositionWatcher = await navigator.Geolocation.WatchPosition(async (p) =>
+        // {
+        //     geopositionChanged++;
+        //     StateHasChanged();
+        //     await window.Console.Log(p);
+        // }
+        // );
+    }
+}

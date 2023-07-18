@@ -20,6 +20,14 @@
 
 @code {
 
+    // Timer is used to invoke Tick method in a short periodic interval via Elapsed event and updates remaining value in textbox.
+    // Stopwatch is mesuring time elapsed because it is not affected by possible dealy from updating UI.
+
+    // MaxInput TimeSpan property is two way binded with time picker and on change (Set) is calling SetTime method.
+    // Values itself is stored in field _maxInput.
+
+    // remainingStr has function assigned and is basically read only, when it is asked for value, it returns functions result.
+
     public Stopwatch stopwatch = new Stopwatch();
     public System.Timers.Timer timer = new System.Timers.Timer();
     public TimeSpan remaining = TimeSpan.FromMilliseconds(0);
