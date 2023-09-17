@@ -29,7 +29,17 @@ builder.Services.AddSqliteWasmDbContextFactory<NotesDbContext>(
 //    return new NotesRepository(context);
 //});
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
+    await db.Database.EnsureCreatedAsync();
+    await db.Database.MigrateAsync();
+    await db.SaveChangesAsync();
+}
+
+host.RunAsync();
 
 
 

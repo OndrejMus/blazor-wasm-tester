@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace BlazorWasmTester.Features.SimpleSQLiteTest
 {
@@ -10,5 +12,7 @@ namespace BlazorWasmTester.Features.SimpleSQLiteTest
         }
 
         public DbSet<Note> Notes { get; set; }
+
+        
     }
 }

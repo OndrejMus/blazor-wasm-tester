@@ -9,12 +9,16 @@
 <MudTextField @bind-Value="@content"
               Label="Content" Variant="Variant.Outlined" />
 
+<MudTextField @bind-Value="@creator"
+              Label="Creator" Variant="Variant.Outlined" />
+
 <MudButton Variant="Variant.Outlined" @onclick="AddNote">Add note</MudButton>
 
 
 @code {
     public string title;
     public string content;
+    public string creator;
 
     NotesRepository notesRepository;
 
@@ -30,6 +34,8 @@
         Note note = new Note();
         note.Title = title;
         note.Content = content;
+        note.Creator = creator;
+        note.CreatedAt = DateTime.UtcNow;
 
         notesRepository.CreateNote(note);
 

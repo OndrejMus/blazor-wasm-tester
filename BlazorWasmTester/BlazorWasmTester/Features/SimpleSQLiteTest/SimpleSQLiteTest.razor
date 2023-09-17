@@ -11,18 +11,22 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Title</th>
                 <th>Content</th>
                 <th>Created At</th>
+                <th>Creator</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var note in notesRepository.GetNotes())
             {
                 <tr>
+                    <td>@note.Id</td>
                     <td>@note.Title</td>
                     <td>@note.Content</td>
-                    <td>@note.CreatedAt</td>
+                    <td>@note.CreatedAt.ToLocalTime</td>
+                    <td>@note.Creator</td>
                 </tr>
             }
         </tbody>
@@ -43,6 +47,10 @@ else
 </div>
 
 
+https://github.com/dotnet/efcore/issues/9842
+https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli#apply-migrations-at-runtime
+
+
 
 @code{
     NotesRepository notesRepository;
@@ -50,6 +58,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         NotesDbContext notesContext = await Factory.CreateDbContextAsync();
+        
+        
         notesRepository = new NotesRepository(notesContext);
         // return base.OnInitializedAsync();
     }
