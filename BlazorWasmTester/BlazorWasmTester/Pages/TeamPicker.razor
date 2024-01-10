@@ -1,0 +1,193 @@
+﻿@page "/TeamPicker"
+
+<h3>Team picker</h3>
+
+<label for="teamCount">Team count:</label>
+<input type="number" min="2" id="teamCount" name="teamCount" @bind="TeamCount"><br><br>
+
+<form @onsubmit=AddMember>  
+    <label for="member">Member:</label>
+    <input type="text" minlength="1" id="member" name="member" @bind="MemberName"><br><br>
+    <button class="button-4" type="button" >Add member</button>
+</form>
+
+@*@onclick="@AddMember"*@
+<button class="button-4" type="button" @onclick="@SetTeams">Set teams</button>
+<br><br>
+
+@if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <br><br>
+    <label>@ErrorMessage</label>
+    <br><br>
+}
+
+
+<h4>Members</h4>
+<div class="flex-container">
+    @foreach (var member in Members)
+    {
+        <div>@member<br>
+            <button class="button-4" @onclick="@(e => DeleteMember(member))">X</button>
+        </div>
+    }
+</div>
+
+@*<table class="table">
+    <tr>
+        <th>Position</th>
+        <th>Members</th>
+    </tr>
+    @foreach (var member in Members)
+    {
+        <tr>
+            <td>@(Members.IndexOf(member)+1)</td>
+            <td>@member</td>
+            <td><button @onclick="@(e => Members.Remove(member))">X</button></td>
+        </tr>
+    }
+</table>*@
+
+
+<br><br>
+
+<h4>Teams</h4>
+
+<table class="table">
+   @*  <tr>
+        <th>Teams</th>
+    </tr> *@
+    @for (int i = 0; i < Teams.Count; i++)
+    {
+        <tr class="tr">
+            <td>
+                <h5>Team @i</h5>
+                <div class="flex-container">
+                    @foreach (var member in Teams[i])
+                    {
+                        <div>
+                            @member<br>
+                            @* <button class="button-4" @onclick="@(e => Members.Remove(member))">X</button> *@
+                        </div>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+
+
+
+
+@code {
+    public List<string> Members = new List<string>();
+    public int TeamCount = 2;
+    public string ErrorMessage = "";
+    public string MemberName = "";
+
+    public List<List<string>> Teams = new List<List<string>>();
+
+    // public void CheckKeyPress(KeyboardEventArgs e)
+    // {
+    //     if (e.Code == "Enter" || e.Code == "NumpadEnter")
+    //     {
+    //             AddMember();
+    //     }
+    // }
+
+    public void AddMember(EventArgs e = null)
+    {
+        ErrorMessage = "";
+        if (string.IsNullOrWhiteSpace(MemberName))
+        {
+            ErrorMessage = "Please provide member name before adding.";
+            return;
+        }
+
+        if (Members.Exists(x => x==MemberName))
+        {
+            ErrorMessage = "This name already exists.";
+            return;
+        }
+
+        Members.Add(MemberName);
+        MemberName = "";
+        // StateHasChanged();
+    }
+    public void DeleteMember(string member)
+    {
+        Members.Remove(member);
+        SetTeams();
+    }
+    // public string TeamToString(List<string> team)
+    // {
+    //     if (team.Count == 0)
+    //     {
+    //         return "";
+    //     }
+
+    //     string result = "";
+    //     foreach (var member in team)
+    //     {
+    //         result += member+",";
+    //     }
+    //     result = result.Substring(0, result.Length - 1);
+    //     return result;
+    // }
+
+    public void SetTeams()
+    {
+        if (!ValidateInput())
+        {
+            return;
+        }
+
+        Teams = new List<List<string>>();
+
+        // set teams
+        for (int i = 0; i < TeamCount; i++)
+        {
+            Teams.Add(new List<string>());
+        }
+
+        // add members
+        List<string> tempMembers = Members.ToList();
+
+        int iterator = 0;
+        Random rand = new Random();
+
+        while (tempMembers.Count > 0)
+        {
+            if (iterator > Teams.Count-1)
+            {
+                iterator = 0;
+            }
+            int randomMember = rand.Next(0, tempMembers.Count);
+            Teams[iterator].Add(tempMembers[randomMember]);
+            tempMembers.RemoveAt(randomMember);
+
+            iterator++;
+        }
+
+        // StateHasChanged();
+    }
+
+    public bool ValidateInput()
+    {
+        ErrorMessage = "";
+        if (Members.Count < 1)
+        {
+            ErrorMessage = "Provide some members.";
+            return false;
+        }
+
+        if (TeamCount < 2)
+        {
+            ErrorMessage = "Set at least two teams.";
+            return false;
+        }
+
+        return true;
+    }
+
+}
