@@ -58,7 +58,10 @@ input[type=number][b-cvb63k6m3h], select[b-cvb63k6m3h] {
     }
 
 
-
+.errorMessage[b-cvb63k6m3h]{
+    color: red;
+    font: 16;
+}
 
 
 table[b-cvb63k6m3h] {
