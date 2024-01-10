@@ -5,20 +5,21 @@
 <label for="teamCount">Team count:</label>
 <input type="number" min="2" id="teamCount" name="teamCount" @bind="TeamCount"><br><br>
 
-<form @onsubmit=AddMember>  
-    <label for="member">Member:</label>
+<form @onsubmit=AddMember autocomplete="off">  
+    <label for="member">Member name:</label>
     <input type="text" minlength="1" id="member" name="member" @bind="MemberName"><br><br>
-    <button class="button-4" type="button" >Add member</button>
+    <button class="button-4" type="button" @onclick="@AddMember">Add member</button>
 </form>
 
-@*@onclick="@AddMember"*@
-<button class="button-4" type="button" @onclick="@SetTeams">Set teams</button>
+
+<br>
+<button class="button-4" type="button" @onclick="@SetTeams">Randomize teams</button>
 <br><br>
 
 @if (!string.IsNullOrWhiteSpace(ErrorMessage))
 {
     <br><br>
-    <label>@ErrorMessage</label>
+    <label class="errorMessage">@ErrorMessage</label>
     <br><br>
 }
 
@@ -61,7 +62,7 @@
     {
         <tr class="tr">
             <td>
-                <h5>Team @i</h5>
+                <h5>Team @(i+1) (@(Teams[i].Count) members)</h5>
                 <div class="flex-container">
                     @foreach (var member in Teams[i])
                     {
@@ -100,7 +101,7 @@
         ErrorMessage = "";
         if (string.IsNullOrWhiteSpace(MemberName))
         {
-            ErrorMessage = "Please provide member name before adding.";
+            ErrorMessage = "Please provide member name.";
             return;
         }
 
@@ -113,6 +114,8 @@
         Members.Add(MemberName);
         MemberName = "";
         // StateHasChanged();
+
+        SetTeams();
     }
     public void DeleteMember(string member)
     {
