@@ -7,14 +7,21 @@
 
 <form @onsubmit=AddMember autocomplete="off">  
     <label for="member">Member name:</label>
-    <input type="text" minlength="1" id="member" name="member" @bind="MemberName"><br><br>
-    <button class="button-4" type="button" @onclick="@AddMember">Add member</button>
+    <input type="text" @ref="refMemberName" placeholder="Set member name" id="member" @bind="MemberName"><br>
+
+    <label for="memberRating">Member rating:</label>
+    <input type="number" id="memberRating" @bind="MemberRating"><br><br>
+
+    <button class="button-4" type="submit">Add member</button>
 </form>
+
 
 
 <br>
 <button class="button-4" type="button" @onclick="@SetTeams">Randomize teams</button>
-<br><br>
+<button class="button-4" type="button" @onclick="@SetTeamsToCloseRating">Set teams by rating</button>
+<br>
+<br>
 
 @if (!string.IsNullOrWhiteSpace(ErrorMessage))
 {
@@ -28,7 +35,7 @@
 <div class="flex-container">
     @foreach (var member in Members)
     {
-        <div>@member<br>
+        <div>@member.Name (@member.Rating)<br>
             <button class="button-4" @onclick="@(e => DeleteMember(member))">X</button>
         </div>
     }
@@ -58,22 +65,25 @@
    @*  <tr>
         <th>Teams</th>
     </tr> *@
-    @for (int i = 0; i < Teams.Count; i++)
+    @{int xx = 0;}
+    @foreach (var team in Teams)
     {
         <tr class="tr">
             <td>
-                <h5>Team @(i+1) (@(Teams[i].Count) members)</h5>
+                <h5>Team @(xx + 1) (@(team.Count) members, @GetTeamRating(team) total rating)</h5>
+                <button class="button-4" @onclick="() => SetWiningTeam(team)">Win!</button>
                 <div class="flex-container">
-                    @foreach (var member in Teams[i])
+                    @foreach (var member in team)
                     {
                         <div>
-                            @member<br>
+                            @member.Name (@member.Rating)<br>
                             @* <button class="button-4" @onclick="@(e => Members.Remove(member))">X</button> *@
                         </div>
                     }
                 </div>
             </td>
         </tr>
+        xx++;
     }
 </table>
 
@@ -81,12 +91,19 @@
 
 
 @code {
-    public List<string> Members = new List<string>();
+    public List<Member> Members = new List<Member>();
     public int TeamCount = 2;
     public string ErrorMessage = "";
-    public string MemberName = "";
 
-    public List<List<string>> Teams = new List<List<string>>();
+    public string MemberName = "";
+    public int MemberRating = 1000;
+
+    public int RatingPerWin = 100;
+    public int RatingPerLoss = -100;
+
+    ElementReference refMemberName;
+
+    public List<List<Member>> Teams = new List<List<Member>>();
 
     // public void CheckKeyPress(KeyboardEventArgs e)
     // {
@@ -96,7 +113,7 @@
     //     }
     // }
 
-    public void AddMember(EventArgs e = null)
+    public void AddMember()
     {
         ErrorMessage = "";
         if (string.IsNullOrWhiteSpace(MemberName))
@@ -105,22 +122,25 @@
             return;
         }
 
-        if (Members.Exists(x => x==MemberName))
+        if (Members.Exists(x => x.Name==MemberName))
         {
             ErrorMessage = "This name already exists.";
             return;
         }
 
-        Members.Add(MemberName);
+        Members.Add(new Member(MemberName, MemberRating));
         MemberName = "";
+        MemberRating = 1000;
         // StateHasChanged();
 
-        SetTeams();
+        // SetTeams();
+
+        refMemberName.FocusAsync();
     }
-    public void DeleteMember(string member)
+    public void DeleteMember(Member member)
     {
         Members.Remove(member);
-        SetTeams();
+        // SetTeams();
     }
     // public string TeamToString(List<string> team)
     // {
@@ -138,6 +158,36 @@
     //     return result;
     // }
 
+    public int GetTeamRating(List<Member> team)
+    {
+        int teamRating = 0;
+        foreach (var member in team)
+        {
+            teamRating += member.Rating;
+        }
+        return teamRating;
+    }
+
+    public void SetWiningTeam(List<Member> winningTeam)
+    {
+        foreach (var member in winningTeam)
+        {
+            member.Rating += RatingPerWin;
+        }  
+
+        foreach (var team in Teams)
+        {
+            if (team != winningTeam)
+            {
+                foreach (var member in team)
+                {
+                    member.Rating += RatingPerLoss;
+                }
+            }
+        }
+
+    }
+
     public void SetTeams()
     {
         if (!ValidateInput())
@@ -145,16 +195,16 @@
             return;
         }
 
-        Teams = new List<List<string>>();
+        Teams = new List<List<Member>>();
 
         // set teams
         for (int i = 0; i < TeamCount; i++)
         {
-            Teams.Add(new List<string>());
+            Teams.Add(new List<Member>());
         }
 
         // add members
-        List<string> tempMembers = Members.ToList();
+        List<Member> tempMembers = Members.ToList();
 
         int iterator = 0;
         Random rand = new Random();
@@ -165,6 +215,7 @@
             {
                 iterator = 0;
             }
+
             int randomMember = rand.Next(0, tempMembers.Count);
             Teams[iterator].Add(tempMembers[randomMember]);
             tempMembers.RemoveAt(randomMember);
@@ -173,6 +224,35 @@
         }
 
         // StateHasChanged();
+    }
+
+    public void SetTeamsToCloseRating()
+    {
+        if (!ValidateInput())
+        {
+            return;
+        }
+
+        Teams = new List<List<Member>>();
+
+        // set teams
+        for (int i = 0; i < TeamCount; i++)
+        {
+            Teams.Add(new List<Member>());
+        }
+
+        // add members
+        List<Member> tempMembers = Members.ToList();
+
+        while (tempMembers.Count > 0)
+        {
+            Member topRatingMember = tempMembers.MaxBy(x => x.Rating);
+
+            List<Member> lowestScoreTeam = Teams.MinBy(x => GetTeamRating(x));
+
+            lowestScoreTeam.Add(topRatingMember);
+            tempMembers.Remove(topRatingMember);
+        }
     }
 
     public bool ValidateInput()
@@ -191,6 +271,22 @@
         }
 
         return true;
+    }
+
+    public class Member
+    {
+        public string Name { get; set; }
+        public int Rating { get; set; } = 1000;
+
+        public Member(string name)
+        {
+            Name = name;
+        }
+        public Member(string name, int rating)
+        {
+            Name = name;
+            Rating = rating;
+        }
     }
 
 }
