@@ -1,4 +1,5 @@
 ﻿@page "/TeamPicker"
+@using MudBlazor
 
 <h3>Team picker</h3>
 
@@ -89,6 +90,10 @@
 
 
 
+<div>
+    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" ChartOptions="chartOptions" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+</div>
+
 
 @code {
     public List<Member> Members = new List<Member>();
@@ -104,6 +109,46 @@
     ElementReference refMemberName;
 
     public List<List<Member>> Teams = new List<List<Member>>();
+
+
+
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        // new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+        // new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
+        // new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
+
+
+    };
+    // public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+    public string[] XAxisLabels = {  };
+
+    ChartOptions chartOptions = new ChartOptions()
+    {
+        MaxNumYAxisTicks = 10,
+        YAxisTicks = 100,
+
+    };
+
+
+    public void AddMembersToChart()
+    {
+        List<string> labels = new List<string>();
+        Series.Clear();
+
+        foreach (var member in Members.OrderByDescending(x => x.Rating))
+        {
+            ChartSeries item = new ChartSeries();
+            item.Name = member.Name;
+            item.Data = new double[] { (double)member.Rating };
+            Series.Add(item);
+
+            labels.Add(member.Name);
+        }
+
+        XAxisLabels = labels.ToArray();
+    }
 
     // public void CheckKeyPress(KeyboardEventArgs e)
     // {
@@ -128,18 +173,22 @@
             return;
         }
 
-        Members.Add(new Member(MemberName, MemberRating));
+        Member member = new Member(MemberName, MemberRating);
+        Members.Add(member);
         MemberName = "";
         MemberRating = 1000;
         // StateHasChanged();
 
         // SetTeams();
 
+        AddMembersToChart();
+
         refMemberName.FocusAsync();
     }
     public void DeleteMember(Member member)
     {
         Members.Remove(member);
+        AddMembersToChart();
         // SetTeams();
     }
     // public string TeamToString(List<string> team)
@@ -185,6 +234,8 @@
                 }
             }
         }
+
+        AddMembersToChart();
 
     }
 
